@@ -42,8 +42,9 @@ export function SessionCards() {
   const qualifyingCards = sessions.filter((session) => session.session_type === "Qualifying")
   const raceCards = sessions.filter((session) => session.session_type === "Race")
 
-  const navigateToSession = (sessionKey: string) => {
-    router.push(`/session/${sessionKey}`)
+  const navigateToSession = (sessionKey: string, sessionType: string) => {
+    // Adicionar o parâmetro meeting para que possamos buscar todas as sessões relacionadas
+    router.push(`/session/${sessionKey}?meeting=${meetingKey}`)
   }
 
   if (loading) {
@@ -80,7 +81,16 @@ export function SessionCards() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="relative h-48 mb-4 rounded-md overflow-hidden">
-              <Image src="/placeholder.svg?height=200&width=400" alt="Imagem de treino" fill className="object-cover" />
+              <Image
+                src="/images/backgrounds/practice-bg.jpg"
+                alt="Imagem de treino"
+                fill
+                className="object-cover"
+                onError={(e) => {
+                  // Fallback para placeholder se a imagem não existir
+                  e.currentTarget.src = "/placeholder.svg?height=200&width=400"
+                }}
+              />
             </div>
             <CardDescription className="text-sm">
               Descrição do dashboard de Treinos, aqui o usuário terá acesso a um dashboard específico para as seções de
@@ -88,7 +98,10 @@ export function SessionCards() {
             </CardDescription>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={() => navigateToSession(practiceCards[0].session_key.toString())}>
+            <Button
+              className="w-full"
+              onClick={() => navigateToSession(practiceCards[0].session_key.toString(), "Practice")}
+            >
               Visualizar Treinos
             </Button>
           </CardFooter>
@@ -104,10 +117,14 @@ export function SessionCards() {
           <CardContent className="pt-6">
             <div className="relative h-48 mb-4 rounded-md overflow-hidden">
               <Image
-                src="/placeholder.svg?height=200&width=400"
+                src="/images/backgrounds/qualifying-bg.jpg"
                 alt="Imagem de classificação"
                 fill
                 className="object-cover"
+                onError={(e) => {
+                  // Fallback para placeholder se a imagem não existir
+                  e.currentTarget.src = "/placeholder.svg?height=200&width=400"
+                }}
               />
             </div>
             <CardDescription className="text-sm">
@@ -116,7 +133,10 @@ export function SessionCards() {
             </CardDescription>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={() => navigateToSession(qualifyingCards[0].session_key.toString())}>
+            <Button
+              className="w-full"
+              onClick={() => navigateToSession(qualifyingCards[0].session_key.toString(), "Qualifying")}
+            >
               Visualizar Qualifying
             </Button>
           </CardFooter>
@@ -132,10 +152,14 @@ export function SessionCards() {
           <CardContent className="pt-6">
             <div className="relative h-48 mb-4 rounded-md overflow-hidden">
               <Image
-                src="/placeholder.svg?height=200&width=400"
+                src="/images/backgrounds/race-bg.jpg"
                 alt="Imagem de corrida"
                 fill
                 className="object-cover"
+                onError={(e) => {
+                  // Fallback para placeholder se a imagem não existir
+                  e.currentTarget.src = "/placeholder.svg?height=200&width=400"
+                }}
               />
             </div>
             <CardDescription className="text-sm">
@@ -144,7 +168,7 @@ export function SessionCards() {
             </CardDescription>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={() => navigateToSession(raceCards[0].session_key.toString())}>
+            <Button className="w-full" onClick={() => navigateToSession(raceCards[0].session_key.toString(), "Race")}>
               Visualizar Corrida
             </Button>
           </CardFooter>
