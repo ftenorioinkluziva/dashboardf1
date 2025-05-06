@@ -18,9 +18,12 @@ export function LapSegmentVisualization({ segments, sectorNumber }: LapSegmentVi
     <div className="flex h-5 w-full rounded overflow-hidden border border-gray-300">
       {segments.map((segment, index) => {
         const colorInfo = segmentColorMap[segment] || segmentColorMap[0]
+        // Usar uma combinação de sectorNumber, index e segment para garantir chaves únicas
+        const uniqueKey = `sector-${sectorNumber}-segment-${index}-${segment}`
+
         return (
           <div
-            key={`${sectorNumber}-${index}`}
+            key={uniqueKey}
             className="h-full border-r last:border-r-0 border-gray-300/50"
             style={{
               backgroundColor: colorInfo.cssColor,

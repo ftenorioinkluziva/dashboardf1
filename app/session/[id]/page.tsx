@@ -1,162 +1,65 @@
-import { Header } from "@/components/header"
-import { getSessionById, getSessionsByMeetingKey } from "@/lib/data"
-import { formatDate } from "@/lib/utils"
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, Calendar, Clock, Flag, MapPin } from "lucide-react"
-import { SessionSelector } from "@/components/session-selector"
+import { getSessionById } from "@/lib/data"
 import { SessionStandings } from "@/components/session-standings"
 import { QualifyingResults } from "@/components/qualifying-results"
-import Image from "next/image"
+import { RaceResults } from "@/components/race-results"
+import { formatDate } from "@/lib/utils"
 
+// Modifique a interface SessionPageProps para aceitar params como Promise ou objeto direto
 interface SessionPageProps {
-  params: Promise<{
-    id: string
-  }>
-  searchParams: Promise<{
-    meeting?: string
-  }>
+  params:
+    | Promise<{
+        id: string
+      }>
+    | {
+        id: string
+      }
 }
 
-export default async function SessionPage({ params, searchParams }: SessionPageProps) {
-  // Aguardar a resolução dos parâmetros
-  const id = await (await params).id
-  const meetingParam = await (await searchParams).meeting
+export default async function SessionPage({ params }: SessionPageProps) {
+  // Aguardar a resolução dos parâmetros se for uma Promise
+  const resolvedParams = params instanceof Promise ? await params : params
+  const sessionId = resolvedParams.id
 
-  const session = await getSessionById(id)
+  const session = await getSessionById(sessionId)
 
   if (!session) {
-    notFound()
+    return (
+      <div className="container mx-auto py-8">
+        <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Sessão não encontrada</h1>
+          <p className="text-gray-600">A sessão solicitada não foi encontrada ou não está disponível.</p>
+        </div>
+      </div>
+    )
   }
 
-  // Buscar todas as sessões do mesmo meeting para o seletor
-  const allSessions = meetingParam ? await getSessionsByMeetingKey(meetingParam) : []
-
-  // Mapeamento de nomes de circuitos para arquivos de imagem
-  const circuitImageMap: Record<string, string> = {
-    Melbourne: "/images/circuits/melbourne.png",
-    "Albert Park": "/images/circuits/melbourne.png",
-    Shanghai: "/placeholder.svg?height=300&width=500", // Adicionar imagem do circuito de Shanghai quando disponível
-    // Adicione mais circuitos conforme necessário
+  // Vamos atualizar a lógica para determinar o componente correto com base no session_type e session_name
+  let sessionComponent
+  if (session.session_type === "Qualifying") {
+    // Qualquer tipo de classificação usa o componente QualifyingResults
+    sessionComponent = <QualifyingResults sessionId={sessionId} />
+  } else if (session.session_type === "Race") {
+    // Tanto a corrida principal quanto a sprint usam o componente RaceResults
+    // Passamos o session_name para diferenciar entre eles na UI
+    sessionComponent = <RaceResults sessionId={sessionId} sessionType={session.session_name} />
+  } else {
+    // Para sessões de treino (Practice)
+    sessionComponent = <SessionStandings sessionId={sessionId} />
   }
 
-  // Determinar qual imagem usar
-  const circuitImageUrl = circuitImageMap[session.circuit_short_name] || "/placeholder.svg?height=300&width=500"
-
-  // Verificar se é uma sessão de qualifying
-  const isQualifying = session.session_type === "Qualifying"
+  // Formatar a data corretamente
+  const formattedDate = formatDate(session.date_start.$date)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link
-            href={`/?meeting=${session.meeting_key}`}
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar para eventos
-          </Link>
-        </div>
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold mb-2">{session.session_name}</h1>
+        <p className="text-gray-600">
+          {session.location} - {formattedDate}
+        </p>
+      </div>
 
-        {/* Seletor de sessão - funciona para qualquer tipo de sessão */}
-        {allSessions.length > 0 && (
-          <div className="mb-6">
-            <SessionSelector
-              sessions={allSessions}
-              currentSessionId={id}
-              meetingKey={session.meeting_key.toString()}
-              sessionType={session.session_type}
-            />
-          </div>
-        )}
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{session.session_name}</h1>
-          <h2 className="text-xl text-muted-foreground">
-            {session.country_name} - {session.location}
-          </h2>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Coluna da esquerda - Cards informativos */}
-          <div className="lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm">Data</span>
-              </div>
-              <p className="font-medium">{formatDate(session.date_start)}</p>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">Horário</span>
-              </div>
-              <p className="font-medium">
-                {new Date(session.date_start).toLocaleTimeString("pt-BR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  timeZone: "UTC",
-                })}{" "}
-                -{" "}
-                {new Date(session.date_end).toLocaleTimeString("pt-BR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  timeZone: "UTC",
-                })}
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                <span className="text-sm">Circuito</span>
-              </div>
-              <p className="font-medium">{session.circuit_short_name}</p>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                <Flag className="h-4 w-4" />
-                <span className="text-sm">Tipo</span>
-              </div>
-              <p className="font-medium">{session.session_type}</p>
-            </div>
-          </div>
-
-          {/* Coluna da direita - Mapa do circuito */}
-          <div className="lg:w-1/2">
-            <div className="bg-white rounded-lg shadow-sm border">
-              <div className="p-4 border-b flex justify-between items-center">
-                <h3 className="font-medium">Circuito: {session.circuit_short_name}</h3>
-                <span className="text-sm text-muted-foreground">{session.country_name}</span>
-              </div>
-              <div className="p-4">
-                <div className="relative h-[200px] w-full rounded-md overflow-hidden">
-                  <Image
-                    src={circuitImageUrl || "/placeholder.svg"}
-                    alt={`Circuito de ${session.circuit_short_name}`}
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 space-y-8">
-          {/* Exibir resultados do qualifying se for uma sessão de qualifying */}
-          {isQualifying && <QualifyingResults sessionId={id} />}
-
-          {/* Exibir a classificação geral da sessão apenas se não for qualifying */}
-          {!isQualifying && <SessionStandings sessionId={id} />}
-        </div>
-      </main>
+      {sessionComponent}
     </div>
   )
 }

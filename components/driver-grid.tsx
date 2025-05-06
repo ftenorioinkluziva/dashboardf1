@@ -78,14 +78,30 @@ export function DriverGrid({ sessionId }: DriverGridProps) {
                 <div className="flex-1">
                   <div className="relative h-24 w-24 mb-2 mx-auto">
                     <Image
-                      src={driver.headshotUrl || "/placeholder.svg?height=100&width=100"}
+                      src={driver.headshotUrl || "/placeholder.svg?height=100&width=100&query=driver"}
                       alt={driver.fullName}
                       fill
                       className="object-contain"
                     />
                   </div>
                   <h3 className="font-bold text-center">{driver.fullName}</h3>
-                  <p className="text-xs text-muted-foreground text-center">{driver.teamName}</p>
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <div className="w-1 h-4 rounded-sm" style={{ backgroundColor: `#${driver.teamColor}` }}></div>
+                    <p className="text-xs text-muted-foreground">{driver.teamName}</p>
+                  </div>
+                  <div className="relative w-full h-8 mt-2 hidden md:block">
+                    <Image
+                      src={`/images/teams/${driver.teamName.toLowerCase().replace(/\s+/g, "")}.png`}
+                      alt={driver.teamName}
+                      fill
+                      className="object-contain"
+                      onError={(e) => {
+                        // Fallback para imagem padrão se a imagem da equipe não existir
+                        const target = e.target as HTMLImageElement
+                        target.src = "/images/teams/placeholder-team.png"
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 

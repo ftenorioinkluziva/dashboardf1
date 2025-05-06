@@ -55,14 +55,14 @@ export function CircuitsGallery() {
       >
         <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
           {circuits.map((circuit) => (
-            <TabsTrigger key={circuit.id} value={circuit.id}>
+            <TabsTrigger key={`tab-${circuit.id}`} value={circuit.id}>
               {circuit.name}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {circuits.map((circuit) => (
-          <TabsContent key={circuit.id} value={circuit.id}>
+          <TabsContent key={`content-${circuit.id}`} value={circuit.id}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -85,19 +85,19 @@ export function CircuitsGallery() {
                     <div>
                       <h3 className="text-lg font-medium">Informações</h3>
                       <ul className="mt-2 space-y-2">
-                        <li className="flex justify-between">
+                        <li key={`${circuit.id}-country`} className="flex justify-between">
                           <span className="text-muted-foreground">País:</span>
                           <span>{circuit.country}</span>
                         </li>
-                        <li className="flex justify-between">
+                        <li key={`${circuit.id}-city`} className="flex justify-between">
                           <span className="text-muted-foreground">Cidade:</span>
                           <span>{circuit.city}</span>
                         </li>
-                        <li className="flex justify-between">
+                        <li key={`${circuit.id}-length`} className="flex justify-between">
                           <span className="text-muted-foreground">Comprimento:</span>
                           <span>{circuit.length}</span>
                         </li>
-                        <li className="flex justify-between">
+                        <li key={`${circuit.id}-turns`} className="flex justify-between">
                           <span className="text-muted-foreground">Curvas:</span>
                           <span>{circuit.turns}</span>
                         </li>
@@ -108,15 +108,15 @@ export function CircuitsGallery() {
                       <div>
                         <h3 className="text-lg font-medium">Recorde de Volta</h3>
                         <ul className="mt-2 space-y-2">
-                          <li className="flex justify-between">
+                          <li key={`${circuit.id}-record-time`} className="flex justify-between">
                             <span className="text-muted-foreground">Tempo:</span>
                             <span className="font-mono">{circuit.lapRecord.time}</span>
                           </li>
-                          <li className="flex justify-between">
+                          <li key={`${circuit.id}-record-driver`} className="flex justify-between">
                             <span className="text-muted-foreground">Piloto:</span>
                             <span>{circuit.lapRecord.driver}</span>
                           </li>
-                          <li className="flex justify-between">
+                          <li key={`${circuit.id}-record-year`} className="flex justify-between">
                             <span className="text-muted-foreground">Ano:</span>
                             <span>{circuit.lapRecord.year}</span>
                           </li>

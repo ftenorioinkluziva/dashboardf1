@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useEffect, useState } from "react"
-import { useIsMobile } from "@/hooks/use-mobile"
+// Atualize a importação para usar a exportação padrão
+import useMobile from "@/hooks/use-mobile"
+
+// Ou, alternativamente, você pode usar a importação nomeada
+// import { useMobile } from "@/hooks/use-mobile"
 
 export function Header() {
   const [email, setEmail] = useState<string | null>(null)
-  const isMobile = useIsMobile() 
+  const isMobile = useMobile()
 
   useEffect(() => {
     // Simulando um usuário logado

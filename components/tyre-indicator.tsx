@@ -1,44 +1,54 @@
 interface TyreIndicatorProps {
   compound: string
-  age: number
+  size?: "xs" | "sm" | "md"
 }
 
-export function TyreIndicator({ compound, age }: TyreIndicatorProps) {
-  let bgColor = "bg-gray-400"
-  let textColor = "text-white"
-  let borderColor = "border-gray-500"
+export function TyreIndicator({ compound, size = "md" }: TyreIndicatorProps) {
+  let bgColor = "bg-gray-200"
+  let textColor = "text-gray-700"
+  let displayText = "UNK"
 
   switch (compound?.toUpperCase()) {
     case "SOFT":
-      bgColor = "bg-red-500"
-      borderColor = "border-red-700"
+      bgColor = "bg-red-100"
+      textColor = "text-red-700"
+      displayText = "SOFT"
       break
     case "MEDIUM":
-      bgColor = "bg-yellow-400"
-      textColor = "text-black font-bold"
-      borderColor = "border-yellow-600"
+      bgColor = "bg-yellow-100"
+      textColor = "text-yellow-800"
+      displayText = "MEDIUM"
       break
     case "HARD":
       bgColor = "bg-white"
-      textColor = "text-black font-bold"
-      borderColor = "border-gray-400"
+      textColor = "text-gray-800"
+      displayText = "HARD"
       break
     case "INTERMEDIATE":
-      bgColor = "bg-green-500"
-      borderColor = "border-green-700"
+      bgColor = "bg-green-100"
+      textColor = "text-green-700"
+      displayText = "INT"
       break
     case "WET":
-      bgColor = "bg-blue-500"
-      borderColor = "border-blue-700"
+      bgColor = "bg-blue-100"
+      textColor = "text-blue-700"
+      displayText = "WET"
       break
+    default:
+      bgColor = "bg-gray-200"
+      textColor = "text-gray-700"
+      displayText = "UNK"
+  }
+
+  const sizeClasses = {
+    xs: "text-[10px] px-1 py-0.5",
+    sm: "text-xs px-1.5 py-0.5",
+    md: "text-xs px-2 py-1",
   }
 
   return (
-    <div
-      className={`inline-flex items-center justify-center rounded-full ${bgColor} ${textColor} w-6 h-6 text-xs font-bold border ${borderColor}`}
-      title={`${compound} (${age} voltas)`}
-    >
-      {compound?.charAt(0)}
-    </div>
+    <span className={`inline-block ${bgColor} ${textColor} font-medium rounded ${sizeClasses[size]}`}>
+      {displayText}
+    </span>
   )
 }
