@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { getSessionStandings } from "@/lib/data"
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  // Aguardar a resolução dos parâmetros
+  // Await the params object before accessing its properties
   const resolvedParams = await params
   const sessionId = resolvedParams.id
 

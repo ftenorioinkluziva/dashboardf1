@@ -124,3 +124,69 @@ export interface DriverStanding {
   bestLapNumber: number
   position: number
 }
+
+export interface RaceControl {
+  _id: { $numberLong: string }
+  meeting_key: number
+  session_key: number
+  date: { $date: string }
+  driver_number: number | null
+  lap_number: number | null
+  category: string
+  flag: string
+  scope: string
+  sector: number | null
+  message: string
+  _key: string
+}
+
+export interface QualifyingStage {
+  name: string
+  startTime: Date
+  endTime: Date
+  drivers: DriverQualifyingResult[]
+}
+
+// Adicione o tipo para representar uma volta individual
+export interface LapData {
+  lapNumber: number
+  lapTime: number
+  sector1: number | null
+  sector2: number | null
+  sector3: number | null
+  timestamp: Date
+}
+
+// Modifique a interface DriverQualifyingResult para incluir todas as voltas
+export interface DriverQualifyingResult {
+  driverNumber: number
+  fullName: string
+  nameAcronym: string
+  teamName: string
+  teamColor: string
+  headshotUrl: string
+  bestLapTime: number | null
+  bestLapNumber: number | null
+  position: number
+  eliminated: boolean
+  compound: string | null
+  q1Time?: number | null
+  q2Time?: number | null
+  q3Time?: number | null
+  sector1Time?: number | null
+  sector2Time?: number | null
+  sector3Time?: number | null
+  bestLapDetails?: {
+    sector1: number | null
+    sector2: number | null
+    sector3: number | null
+    lapNumber: number | null
+    compound: string | null
+  } | null
+  allLaps?: LapData[] // Adicione esta linha para incluir todas as voltas
+}
+
+export interface QualifyingResult {
+  stages: QualifyingStage[]
+  finalGrid: DriverQualifyingResult[]
+}

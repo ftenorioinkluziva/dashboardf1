@@ -1,4 +1,4 @@
-import type { Session, Driver, Lap, Stint, Position, DriverStanding } from "./types"
+import type { Session, Driver, Lap, Stint, Position, DriverStanding, QualifyingResult } from "./types"
 
 export async function fetchSessions(meetingKey: string): Promise<Session[]> {
   try {
@@ -95,6 +95,64 @@ export async function fetchSessionStandings(sessionId: string): Promise<DriverSt
   } catch (error) {
     console.error("Erro ao buscar classificação da sessão:", error)
     return []
+  }
+}
+
+export async function fetchQualifyingResults(sessionId: string): Promise<QualifyingResult> {
+  try {
+    // Remover este log
+    // Verificar se a rota da API está correta
+    const apiUrl = `/api/sessions/${sessionId}/qualifying`
+    // Remover este log
+
+    const response = await fetch(apiUrl)
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "No error details available")
+      // Verificar se é um erro 404 (rota não encontrada)
+      if (response.status === 404) {
+        return {
+          stages: [],
+          finalGrid: [],
+        }
+      }
+
+      throw new Error(`Falha ao buscar resultados do qualifying: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    // Remover este log
+
+    // Garantir que as datas são objetos Date
+    if (data.stages) {
+      data.stages = data.stages.map((stage: any) => ({
+        ...stage,
+        startTime: new Date(stage.startTime),
+        endTime: new Date(stage.endTime),
+      }))
+    }
+
+    // Check if this is a Sprint Qualifying session and update stage names if needed
+    if (data.stages && data.stages.length > 0) {
+      const isSprintQualifying = data.stages[0].name.startsWith("SQ")
+
+      if (isSprintQualifying) {
+        // Make sure all stage names use SQ prefix
+        data.stages = data.stages.map((stage: any, index: number) => ({
+          ...stage,
+          name: `SQ${index + 1}`,
+        }))
+      }
+    }
+
+    return data
+  } catch (error) {
+    // Capturar erro silenciosamente
+    // Return a default structure instead of throwing
+    return {
+      stages: [],
+      finalGrid: [],
+    }
   }
 }
 

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowLeft, Calendar, Clock, Flag, MapPin } from "lucide-react"
 import { SessionSelector } from "@/components/session-selector"
 import { SessionStandings } from "@/components/session-standings"
+import { QualifyingResults } from "@/components/qualifying-results"
 import Image from "next/image"
 
 interface SessionPageProps {
@@ -41,6 +42,9 @@ export default async function SessionPage({ params, searchParams }: SessionPageP
 
   // Determinar qual imagem usar
   const circuitImageUrl = circuitImageMap[session.circuit_short_name] || "/placeholder.svg?height=300&width=500"
+
+  // Verificar se é uma sessão de qualifying
+  const isQualifying = session.session_type === "Qualifying"
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -145,8 +149,12 @@ export default async function SessionPage({ params, searchParams }: SessionPageP
           </div>
         </div>
 
-        <div className="mt-8">
-          <SessionStandings sessionId={id} />
+        <div className="mt-8 space-y-8">
+          {/* Exibir resultados do qualifying se for uma sessão de qualifying */}
+          {isQualifying && <QualifyingResults sessionId={id} />}
+
+          {/* Exibir a classificação geral da sessão apenas se não for qualifying */}
+          {!isQualifying && <SessionStandings sessionId={id} />}
         </div>
       </main>
     </div>

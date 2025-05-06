@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ driv
   const { searchParams } = new URL(request.url)
   const sessionKey = searchParams.get("sessionKey")
 
-  // Aguardar a resolução dos parâmetros
+  // Await the params object before accessing its properties
   const resolvedParams = await params
   const driverNumber = resolvedParams.driverNumber
 
