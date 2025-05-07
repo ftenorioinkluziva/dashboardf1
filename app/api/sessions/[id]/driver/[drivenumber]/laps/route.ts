@@ -1,15 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 
-export async function GET(request: NextRequest, context: { params: { id: string; driverNumber: string } }) {
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: string; driverNumber: string } }
+) {
   try {
+    // Acessar os parâmetros da rota da forma correta
+    const id = context.params.id;
+    const driverNumber = context.params.driverNumber;
     
-    const resolvedParams = await context.params;
-    const { id, driverNumber } = resolvedParams;
+    console.log(`Buscando voltas para sessão ${id} e piloto ${driverNumber}`);
 
-    console.log(`Buscando voltas para sessão ${id} e piloto ${driverNumber}`)
-
-    const { db } = await connectToDatabase()
+    const { db } = await connectToDatabase();
 
     const laps = await db
       .collection("laps")
@@ -18,7 +21,7 @@ export async function GET(request: NextRequest, context: { params: { id: string;
         driver_number: Number.parseInt(driverNumber),
       })
       .sort({ lap_number: 1 })
-      .toArray()
+      .toArray();
 
     // Adicionar flag para melhor volta pessoal
     if (laps && laps.length > 0) {

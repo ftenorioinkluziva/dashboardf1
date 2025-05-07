@@ -2,11 +2,15 @@ import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import type { TeamRadio } from "@/lib/types"
 
-export async function GET(request: NextRequest, context: { params: { id: string; driverNumber: string } }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string; driverNumber: string }> }
+) {
   try {
-    const resolvedParams = await context.params;
+    // Aguardar a resolução dos parâmetros
+    const resolvedParams = await params;
     const { id, driverNumber } = resolvedParams;
-
+    
     console.log(`Buscando mensagens de rádio para sessão ${id} e piloto ${driverNumber}`)
 
     const { db } = await connectToDatabase()
