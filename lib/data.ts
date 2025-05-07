@@ -297,26 +297,26 @@ export async function getSessionStandings(sessionId: string) {
 // Nova função para obter os resultados de corrida (RACE ou SPRINT)
 export async function getRaceResults(sessionId: string): Promise<RaceResult[]> {
   try {
-    console.log(`Buscando resultados de corrida para a sessão ${sessionId}`)
+   
     const { db } = await connectToDatabase()
 
     // Buscar todos os pilotos da sessão
     const drivers = await getDriversBySessionKey(sessionId)
-    console.log(`Encontrados ${drivers.length} pilotos para a sessão ${sessionId}`)
+    
 
     if (drivers.length === 0) {
-      console.log(`Nenhum piloto encontrado para a sessão ${sessionId}`)
+      
       return []
     }
 
     // Verificar se temos dados de posição para esta sessão
     const positionSample = await db.collection("position").findOne({ session_key: Number.parseInt(sessionId) })
 
-    console.log(`Dados de posição encontrados: ${positionSample ? "Sim" : "Não"}`)
+ 
 
     // Se não tivermos dados de posição, usar a classificação por tempo de volta
     if (!positionSample) {
-      console.log(`Sem dados de posição, usando classificação por tempo de volta`)
+     
       const timeBasedResults = await getSessionStandings(sessionId)
 
       // Converter para o formato RaceResult
@@ -333,7 +333,7 @@ export async function getRaceResults(sessionId: string): Promise<RaceResult[]> {
     // Para cada piloto, buscar sua última posição registrada
     const results = await Promise.all(
       drivers.map(async (driver: any) => {
-        console.log(`Processando piloto ${driver.driver_number} (${driver.name_acronym})`)
+      
 
         // Buscar todas as posições do piloto nesta sessão, ordenadas por data
         const positions = await db
@@ -346,7 +346,7 @@ export async function getRaceResults(sessionId: string): Promise<RaceResult[]> {
           .limit(1) // Pegar apenas a mais recente
           .toArray()
 
-        console.log(`Encontradas ${positions.length} posições para o piloto ${driver.driver_number}`)
+       
 
         // Obter a melhor volta do piloto
         const bestLapInfo = await getBestLapInfo(sessionId, driver.driver_number.toString())
@@ -394,16 +394,15 @@ export async function getRaceResults(sessionId: string): Promise<RaceResult[]> {
       }),
     )
 
-    console.log(`Processados ${results.length} pilotos com resultados`)
-
+ 
     // Filtrar pilotos sem posição e ordenar por posição
     const validResults = results.filter((driver) => driver.position !== 999).sort((a, b) => a.position - b.position)
 
-    console.log(`${validResults.length} pilotos com posições válidas`)
+  
 
     // Se não tivermos resultados válidos, retornar array vazio
     if (validResults.length === 0) {
-      console.log(`Nenhum resultado válido encontrado`)
+      
       return []
     }
 
@@ -418,7 +417,7 @@ export async function getRaceResults(sessionId: string): Promise<RaceResult[]> {
       .toArray()
 
     const totalLaps = sessionLaps.length > 0 ? sessionLaps[0].lap_number : 0
-    console.log(`Total de voltas na sessão: ${totalLaps}`)
+    
 
     // Calcular gaps e intervals
     validResults.forEach((driver, index) => {
@@ -437,7 +436,7 @@ export async function getRaceResults(sessionId: string): Promise<RaceResult[]> {
       }
     })
 
-    console.log(`Retornando ${validResults.length} resultados processados`)
+   
     return validResults
   } catch (error) {
     console.error("Erro ao buscar resultados da corrida:", error)
