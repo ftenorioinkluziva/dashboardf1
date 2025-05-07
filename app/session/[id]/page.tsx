@@ -1,7 +1,7 @@
 import { getSessionById } from "@/lib/data"
 import { SessionStandings } from "@/components/session-standings"
 import { QualifyingResults } from "@/components/qualifying-results"
-import { RaceResults } from "@/components/race-results"
+import { RaceStandings } from "@/components/race-standings"
 import { formatDate } from "@/lib/utils"
 
 // Modifique a interface SessionPageProps para aceitar params como Promise ou objeto direto
@@ -41,7 +41,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
   } else if (session.session_type === "Race") {
     // Tanto a corrida principal quanto a sprint usam o componente RaceResults
     // Passamos o session_name para diferenciar entre eles na UI
-    sessionComponent = <RaceResults sessionId={sessionId} sessionType={session.session_name} />
+    sessionComponent = <RaceStandings sessionId={sessionId}  />
   } else {
     // Para sessões de treino (Practice)
     sessionComponent = <SessionStandings sessionId={sessionId} />

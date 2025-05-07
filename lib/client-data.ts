@@ -15,6 +15,19 @@ export async function fetchSessionStandings(sessionId: string): Promise<DriverSt
   }
 }
 
+export async function fetchRaceStandings(sessionId: string): Promise<DriverStanding[] | RaceResult[]> {
+  try {
+    const response = await fetch(`/api/sessions/${sessionId}/standings`)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch session standings: ${response.statusText}`)
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching session standings:", error)
+    return []
+  }
+}
+
 export async function fetchDrivers(sessionKey: string) {
   try {
     const response = await fetch(`/api/drivers?sessionKey=${sessionKey}`)
