@@ -4,7 +4,8 @@ import type { TeamRadio } from "@/lib/types"
 
 export async function GET(request: NextRequest, context: { params: { id: string; driverNumber: string } }) {
   try {
-    const { id, driverNumber } = context.params
+    const resolvedParams = await context.params;
+    const { id, driverNumber } = resolvedParams;
 
     console.log(`Buscando mensagens de rádio para sessão ${id} e piloto ${driverNumber}`)
 
