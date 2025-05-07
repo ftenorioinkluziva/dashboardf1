@@ -61,13 +61,6 @@ export interface DriverLapData {
 }
 
 export interface Lap {
-  lap_number: number
-  lap_duration?: number
-  compound?: string
-  duration_sector_1?: number
-  duration_sector_2?: number
-  duration_sector_3?: number
-  is_personal_best?: boolean
   _id: { $numberLong: string }
   meeting_key: number
   session_key: number
@@ -86,8 +79,8 @@ export interface Lap {
   segments_sector_3: number[]
   st_speed: number | null
   _key: string
+  compound?: string // Adicionado a partir do stint
   tyre_age?: number // Adicionado a partir do stint
-  // Flag para indicar a melhor volta pessoal
 
   // Aliases para compatibilidade com diferentes componentes
   sector1_time?: number | null
@@ -101,10 +94,6 @@ export interface Lap {
 }
 
 export interface Stint {
-  stint_number: number
-  compound: string
-  lap_start: number
-  lap_end: number
   _id: { $numberLong: string }
   meeting_key: number
   session_key: number
@@ -116,11 +105,6 @@ export interface Stint {
   tyre_age_at_start: number
   _date_start_last_lap: { $date: string }
   _key: string
-  best_lap_time?: number | null
-  best_lap_number?: number | null
-  sector1_time?: number | null
-  sector2_time?: number | null
-  sector3_time?: number | null
 }
 
 export interface SegmentColor {
@@ -175,37 +159,6 @@ export interface RaceResult {
   gap: string | null
   interval: string | null
   lastPosition: any | null
-  i1Speed?: number | null
-  i2Speed?: number | null
-  stSpeed?: number | null
-}
-
-export interface PitStop {
-  _id: { $numberLong: string }
-  meeting_key: number
-  session_key: number
-  driver_number: number
-  lap_number: number
-  pit_duration: number
-  total_duration: number
-  date: { $date: string }
-  previous_compound?: string
-  new_compound?: string
-  _key: string
-  inferred?: boolean
-}
-
-export interface TeamRadio {
-  _id: { $numberLong: string }
-  meeting_key: number
-  session_key: number
-  driver_number: number
-  lap_number: number
-  date: { $date: string }
-  message: string
-  direction: "to_driver" | "from_driver"
-  _key: string
-  simulated?: boolean
 }
 
 export interface RaceControl {

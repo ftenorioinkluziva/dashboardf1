@@ -1,54 +1,46 @@
 interface TyreIndicatorProps {
-  compound: string
-  size?: "xs" | "sm" | "md"
+  compound: string | null | undefined
+  className?: string
 }
 
-export function TyreIndicator({ compound, size = "md" }: TyreIndicatorProps) {
-  let bgColor = "bg-gray-200"
-  let textColor = "text-gray-700"
-  let displayText = "UNK"
+export function TyreIndicator({ compound, className = "" }: TyreIndicatorProps) {
+  if (!compound) return <span className="text-gray-400">-</span>
 
-  switch (compound?.toUpperCase()) {
+  // Normalizar o composto para maiúsculas e remover espaços
+  const normalizedCompound = compound.toUpperCase().trim()
+
+  // Definir cores e estilos com base no composto
+  let bgColor = "bg-yellow-100"
+  let textColor = "text-yellow-800"
+  let displayText = "MEDIUM"
+
+  switch (normalizedCompound) {
     case "SOFT":
+    case "S":
       bgColor = "bg-red-100"
-      textColor = "text-red-700"
+      textColor = "text-red-800"
       displayText = "SOFT"
       break
     case "MEDIUM":
+    case "M":
       bgColor = "bg-yellow-100"
       textColor = "text-yellow-800"
       displayText = "MEDIUM"
       break
     case "HARD":
-      bgColor = "bg-white"
+    case "H":
+      bgColor = "bg-gray-100"
       textColor = "text-gray-800"
       displayText = "HARD"
       break
-    case "INTERMEDIATE":
-      bgColor = "bg-green-100"
-      textColor = "text-green-700"
-      displayText = "INT"
-      break
-    case "WET":
-      bgColor = "bg-blue-100"
-      textColor = "text-blue-700"
-      displayText = "WET"
-      break
     default:
-      bgColor = "bg-gray-200"
-      textColor = "text-gray-700"
-      displayText = "UNK"
-  }
-
-  const sizeClasses = {
-    xs: "text-[10px] px-1 py-0.5",
-    sm: "text-xs px-1.5 py-0.5",
-    md: "text-xs px-2 py-1",
+      // Se não reconhecermos o composto, usar o valor original
+      displayText = normalizedCompound
   }
 
   return (
-    <span className={`inline-block ${bgColor} ${textColor} font-medium rounded ${sizeClasses[size]}`}>
+    <div className={`${bgColor} ${textColor} px-2 py-1 rounded text-center text-xs font-medium ${className}`}>
       {displayText}
-    </span>
+    </div>
   )
 }
