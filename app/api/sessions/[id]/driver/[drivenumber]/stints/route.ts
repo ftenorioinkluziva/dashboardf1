@@ -1,15 +1,16 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string; driverNumber: string }> }) {
+export async function GET(request: NextRequest, context: { params: { id: string; driverNumber: string } }) {
   try {
+    const { id, driverNumber } = context.params
+
+    console.log(`Buscando stints para sessão ${id} e piloto ${driverNumber}`)
+
     const { db } = await connectToDatabase()
-    const resolvedParams = await params
-    const sessionId = resolvedParams.id
-    const driverNumber = Number.parseInt(resolvedParams.driverNumber)
 
     // Buscar informações da sessão para obter as chaves
-    const session = await db.collection("sessions").findOne({ _key: sessionId })
+    const session = await db.collection("sessions").findOne({ session_key: Number.parseInt(id) })
 
     if (!session) {
       return NextResponse.json({ error: "Sessão não encontrada" }, { status: 404 })
@@ -19,9 +20,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const stints = await db
       .collection("stints")
       .find({
-        meeting_key: session.meeting_key,
-        session_key: session.session_key,
-        driver_number: driverNumber,
+        session_key: Number.parseInt(id),
+        driver_number: Number.parseInt(driverNumber),
       })
       .sort({ stint_number: 1 })
       .toArray()
@@ -35,9 +35,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const laps = await db
       .collection("laps")
       .find({
-        meeting_key: session.meeting_key,
-        session_key: session.session_key,
-        driver_number: driverNumber,
+        session_key: Number.parseInt(id),
+        driver_number: Number.parseInt(driverNumber),
       })
       .toArray()
 
@@ -67,9 +66,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }
     })
 
+    console.log(`Encontrados ${stints?.length || 0} stints para o piloto ${driverNumber}`)
     return NextResponse.json(enrichedStints)
   } catch (error) {
     console.error("Erro ao buscar stints:", error)
-    return NextResponse.json({ error: "Erro ao buscar stints" }, { status: 500 })
+    return NextResponse.json([], { status: 500 })
   }
 }

@@ -1,20 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getLapsBySessionAndDriver } from "@/lib/data"
+import { connectToDatabase } from "@/lib/mongodb"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string; driverNumber: string }> }) {
+export async function GET(request: NextRequest, context: { params: { id: string; driverNumber: string } }) {
   try {
-    const resolvedParams = await params
-    const sessionId = resolvedParams.id
-    const driverNumber = resolvedParams.driverNumber
+    const { id, driverNumber } = context.params
 
-    if (!sessionId || !driverNumber) {
-      return NextResponse.json({ error: "Parâmetros inválidos" }, { status: 400 })
-    }
+    console.log(`Buscando voltas para sessão ${id} e piloto ${driverNumber}`)
 
-    console.log(`Buscando voltas para a sessão ${sessionId} e piloto ${driverNumber}`)
+    const { db } = await connectToDatabase()
 
-    // Certifique-se de que estamos passando os parâmetros no formato correto
-    const laps = await getLapsBySessionAndDriver(sessionId, driverNumber)
+    const laps = await db
+      .collection("laps")
+      .find({
+        session_key: Number.parseInt(id),
+        driver_number: Number.parseInt(driverNumber),
+      })
+      .sort({ lap_number: 1 })
+      .toArray()
 
     // Adicionar flag para melhor volta pessoal
     if (laps && laps.length > 0) {
@@ -31,9 +33,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       })
     }
 
+    console.log(`Encontradas ${laps?.length || 0} voltas para o piloto ${driverNumber}`)
     return NextResponse.json(laps || [])
   } catch (error) {
-    console.error("Erro ao buscar voltas do piloto:", error)
-    return NextResponse.json({ error: "Erro ao buscar voltas do piloto" }, { status: 500 })
+    console.error("Erro ao buscar voltas:", error)
+    return NextResponse.json([], { status: 500 })
   }
 }

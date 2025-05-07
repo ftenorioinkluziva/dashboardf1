@@ -192,6 +192,7 @@ export interface PitStop {
   previous_compound?: string
   new_compound?: string
   _key: string
+  inferred?: boolean
 }
 
 export interface TeamRadio {
@@ -204,6 +205,7 @@ export interface TeamRadio {
   message: string
   direction: "to_driver" | "from_driver"
   _key: string
+  simulated?: boolean
 }
 
 export interface RaceControl {
